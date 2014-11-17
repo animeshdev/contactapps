@@ -1,20 +1,15 @@
 var express = require('express'),
-    //api     = require('./api'),
+    api     = require('./api'),
     users   = require('./accounts'),
     app     = express();
 
 app
-    
-     //.use(express.static('./public'))
 
-    //  .get('/login', function (req, res) {
-    //     console.log( 'cccc' );
-    //     res.sendfile('public/login.html');     
-    // })
+    .use(express.static('./public'))
 
     .use(users)
 
-    //.use('/api', api)
+    .use('/api', api)
     .get('*', function (req, res) {
 
         //res.send( 'xxsss' );
@@ -22,7 +17,7 @@ app
         if (!req.user) {
             res.redirect('/login');
         } else {
-            res.sendfile('public/main.html');
+            res.sendfile('index.html');
         }
 
 

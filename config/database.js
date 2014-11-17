@@ -51,10 +51,20 @@ User.pre('save', function(next) {
   if(!user.isModified('password')) return next();
 
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-    if(err) return next(err);
+    if(err) 
+    {
+
+      console.log( 'bcrypt error' );
+      return next(err);
+    }
+      
 
     bcrypt.hash(user.password, salt,null, function(err, hash) {
-      if(err) return next(err);
+      if(err) {
+
+        console.log( 'bcrypt error' );
+        return next(err);
+      }
       user.password = hash;
       next();
     });
@@ -69,6 +79,34 @@ User.methods.comparePassword = function(candidatePassword, cb) {
   });
 };
 
+
+
+var contactSchema = new Schema({
+  name: {
+    first: { type: String, default: '' },
+    last: { type: String, default: '' },
+    clean: { type: String, default: '', unique: true }
+  },
+  email: { type: String, default: '' },
+  number: { type: String, default: '' },
+  notes: { type: String, default: '' },
+  added: Date
+});
+
+contactSchema
+  // Index on important fields
+  .index({ name: { last: 1, clean: 1 }, email: 1 })
+  // Make sure document has 'added' field when first saved
+  .pre('save', function (next) {
+    if( !this.added ) this.added = new Date();
+    this.name.clean = (this.name.first + '-' + this.name.last).toLowerCase();
+    next();
+  });
+
+// Models
+
+var contatcModel = mongoose.model('Contact', contactSchema);
+
 var userModel = mongoose.model('User', User);
 var accountModel = mongoose.model('Account', Account);
 var recordModel = mongoose.model('Record', Record);
@@ -80,3 +118,4 @@ exports.userModel = userModel;
 exports.accountModel = accountModel;
 exports.recordModel = recordModel;
 exports.categoryModel = categoryModel;
+exports.Contact = contatcModel;
