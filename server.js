@@ -1,6 +1,7 @@
 var express = require('express'),
     api     = require('./api'),
     users   = require('./accounts'),
+    pass = require('./config/pass'),
     app     = express();
 
 app
@@ -8,13 +9,14 @@ app
     .use(express.static('./public'))
 
     .use(users)
-
+    .all('/api/*', pass.userIsAuthenticated )
     .use('/api', api)
     .get('*', function (req, res) {
 
-        //res.send( 'xxsss' );
+        //console.log( req.user );
 
-        if (!req.user) {
+
+        if ( !req.user  ) {
             res.redirect('/login');
         } else {
             res.sendfile('index.html');

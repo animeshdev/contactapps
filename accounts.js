@@ -2,6 +2,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     session    = require('express-session'),
+    //MongoStore = require('connect-mongo')(session)
     
     db = require('./config/database'),
     //Bourne     = require('bourne'),
@@ -18,6 +19,8 @@ router
      .use(bodyParser.json())
      .use(bodyParser.urlencoded())
      .use(session({ secret: '123' }))
+
+      //,store: new MongoStore({'db': 'session' }) }))
 
      .use(passport.initialize())
      .use(passport.session())
@@ -68,11 +71,13 @@ router
     })
     .get('/logout', function (req, res) {
         
+        //console.log( req.user );
         req.logout();
+        //req.session.destroy();
 
         //req.user = 1;
-        console.log( req.user );
-        res.redirect('/');
+        //console.log( req.user );
+        res.redirect('/login');
     });
 
 module.exports = router;
