@@ -77,7 +77,7 @@ router
 
         //req.user = 1;
         //console.log( req.user );
-        res.redirect('/login');
+        res.redirect('/');
     });
 
 module.exports = router;

@@ -19,7 +19,7 @@ app
         if ( !req.user  ) {
             res.redirect('/login');
         } else {
-            res.sendfile('index.html');
+            res.sendfile('public/main.html');
         }
 
 
