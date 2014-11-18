@@ -1,8 +1,9 @@
 var express    = require('express'),
     //Bourne     = require('bourne'),
     bodyParser = require('body-parser'),
-
+    methodOverride = require('method-override'),
    db = require('./config/database'),
+   async = require('async'),
     router     = express.Router();
 
     var Contact = db.Contact;
@@ -10,7 +11,7 @@ var express    = require('express'),
 router
     
      .use(bodyParser.json())
-     //.use(bodyParser.urlencoded())
+    .use(methodOverride())
     .route('/contact')
         .get(function (req, res) {
              Contact
@@ -31,6 +32,7 @@ router
             contact.save(function (err, contact) {
               if( err ) return res.send(500, err);
               res.send(contact);
+
             });
             
         });
@@ -66,13 +68,60 @@ router
             //     res.json(data[0]);
             // });
 
-            var contact = new Contact(req.body);
-            delete contact.$promise;
-            delete contact.$resolved;
-            contact.save(function (err, contact) {
+
+        var locals = {};
+        var name = req.params.name;
+        var userId; //Define userId o
+
+        var newcontact = new Contact(req.body).toObject();
+        //var newcontact = newcontact.toObject();
+        delete newcontact.$promise;
+        delete newcontact.$resolved;
+
+        delete newcontact._id;
+        //var upsertData = contact.toObject();
+
+        async.series([
+        //Load user to get userId first
+        function(callback) {
+
+           Contact
+                  .findOne({ 'name.clean': name  } )
+                  .exec(function (err, contact) {
+                    if( err ) return res.send(500, err);
+                    if( !contact ) return res.send(404, new Error("Contact not found."));
+
+                    userId = contact.id;
+                    callback();
+
+                    //res.send(contact);
+                });
+           
+        },
+        //Load posts (won't be called before task 1's "task callback" has been called)
+        function(callback) {
+
+            Contact.update({_id: userId}, newcontact, {upsert: true}, function (err, contact) {
               if( err ) return res.send(500, err);
-              res.send(contact);
+
+              locals = contact;
+              callback();
+
+              
             });
+            
+
+        }
+    ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
+        if (err) return next(err);
+        //Here locals will be populated with 'user' and 'posts'
+        res.send(locals);
+    });
+
+
+           
+
+            
 
 
 

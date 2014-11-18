@@ -67,10 +67,11 @@ router
             
     })
     .get('/logout', function (req, res) {
-        // req.session.userId = null;
         
-        req.session.destroy();
         req.logout();
+
+        //req.user = 1;
+        console.log( req.user );
         res.redirect('/');
     });
 
