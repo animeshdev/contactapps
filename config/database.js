@@ -22,27 +22,7 @@ var User = new Schema({
   password: { type: String, required: true}
 });
 
-var Category = new Schema({
-  user_id: { type: Schema.ObjectId, ref: 'User', required: true },
-  name: { type: String, required: true }
-});
 
-var Account = new Schema({
-  user_id: { type: Schema.ObjectId, ref: 'User', required: true },
-  name: { type: String, required: true },
-  currency: { type: String, required: true },
-  balance: { type: Number, required: true },
-});
-
-var Record = new Schema({
-  account_id: { type: Schema.ObjectId, ref: 'Account', required: true },
-  user_id: { type: Schema.ObjectId, ref: 'User', required: true },
-  category: { type: String, required: true },
-  amount: { type: Number, required: true },
-  date: { type: Date, default: Date.now },
-  is_expense: { type: Boolean, default: true },
-  description: { type: String }
-});
 
 // Bcrypt middleware on UserSchema
 User.pre('save', function(next) {
@@ -82,6 +62,8 @@ User.methods.comparePassword = function(candidatePassword, cb) {
 
 
 var contactSchema = new Schema({
+
+  _creator:{ type: Schema.ObjectId},
   name: {
     first: { type: String, default: '' },
     last: { type: String, default: '' },
@@ -108,14 +90,9 @@ contactSchema
 var contatcModel = mongoose.model('Contact', contactSchema);
 
 var userModel = mongoose.model('User', User);
-var accountModel = mongoose.model('Account', Account);
-var recordModel = mongoose.model('Record', Record);
-var categoryModel = mongoose.model('Category', Category);
 
 
 // Export Models
 exports.userModel = userModel;
-exports.accountModel = accountModel;
-exports.recordModel = recordModel;
-exports.categoryModel = categoryModel;
+
 exports.Contact = contatcModel;

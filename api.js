@@ -15,7 +15,7 @@ router
     .route('/contact')
         .get(function (req, res) {
              Contact
-              .find(null, { _id: 0 })
+              .find({_creator:req.user._id}, { _id: 0 })
               .sort('name.last')
               .exec(function (err, contacts) {
                 if( err ) return res.send(500, err);
@@ -27,7 +27,9 @@ router
 
             var contact = new Contact(req.body);
 
-            console.log(req.body);
+            contact._creator = req.user._id; 
+
+            console.log(contact);
 
             contact.save(function (err, contact) {
               if( err ) return res.send(500, err);
